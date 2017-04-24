@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.baseadapter.interfaces;
+package in.habel.chat_adapters.interfaces;
 
 /**
  * Created by habel on 23/4/17.

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="divider">#EAEAE9</color>
+
+    <color name="bg_chat_bubble_out">#ef9a9a</color>
+    <color name="bg_stroke_chat_bubble_out">#dddddd</color>
+
+
+    <color name="bg_chat_bubble_in">#f4b7b7</color>
+    <color name="bg_stroke_chat_bubble_in">#f0f0f0</color>
 </resources>

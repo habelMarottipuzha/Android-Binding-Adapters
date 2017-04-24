@@ -1,18 +1,26 @@
-package in.habel.android_binding_adapters;
+package in.habel.chat_adapters;
 
-import in.habel.chat_adapters.baseadapter.interfaces.chatInterface;
+import in.habel.chat_adapters.interfaces.chatInterface;
 
 /**
  * Created by habel on 23/4/17.
  */
 
 public class DemoChatModel implements chatInterface {
+    private static
+    boolean isOut;
     private String message;
+    private String user;
     private long addedOn;
-    private boolean isOut;
 
     public DemoChatModel(String message, long addedOn) {
         this.message = message;
+        this.addedOn = addedOn;
+    }
+
+    public DemoChatModel(String message, String user, long addedOn) {
+        this.message = message;
+        this.user = user;
         this.addedOn = addedOn;
     }
 
@@ -36,5 +44,13 @@ public class DemoChatModel implements chatInterface {
     public boolean isOutgoing() {
         isOut = !isOut; //toggle chat positions
         return isOut;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

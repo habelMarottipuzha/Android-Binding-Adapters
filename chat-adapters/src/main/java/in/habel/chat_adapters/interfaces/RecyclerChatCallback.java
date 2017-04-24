@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.baseadapter.interfaces;
+package in.habel.chat_adapters.interfaces;
 
 import android.databinding.ViewDataBinding;
 

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">chat-adapters</string>
+
+    <string name="default_chat_message">Chat message goes here…</string>
 </resources>

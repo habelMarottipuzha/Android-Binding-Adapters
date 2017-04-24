@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import in.habel.chat_adapters.baseadapter.interfaces.RecyclerCallback;
+import in.habel.chat_adapters.interfaces.RecyclerCallback;
 
 public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
     private final Context context;
