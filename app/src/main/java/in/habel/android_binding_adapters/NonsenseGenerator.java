@@ -83,6 +83,10 @@ public class NonsenseGenerator {
         return joinWords(words);
     }
 
+    public String getRandomThing() {
+        return pickOneOf(THINGS);
+    }
+
     /**
      * Produces news article text.
      *
