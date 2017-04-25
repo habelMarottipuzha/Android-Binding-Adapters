@@ -100,6 +100,14 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         insert(data, position);
     }
 
+    public void insert(ArrayList<T> data) {
+        if (data.size() > getItemCount()) {
+            for (int i = getItemCount(); i < data.size(); i++) {
+                insert(data.get(i));
+            }
+        }
+    }
+
     public void insert(T data, int position) {
         lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
         items.add(position, data);
@@ -141,6 +149,7 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         notifyDataSetChanged();
         scrollIfLast();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
