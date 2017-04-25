@@ -14,7 +14,11 @@ class MockChatData {
 
 
     static ArrayList<DemoChatModel> getChatMockDataList() {
-        if (chatData == null) chatData = new ArrayList<>();
+        if (chatData == null) {
+            chatData = new ArrayList<>();
+            chatData.add(new DemoChatModel("Hi, this is Mia", "Mia", System.currentTimeMillis()));
+            return chatData;
+        }
         DemoChatModel model = new DemoChatModel(generator.makeText(2), System.currentTimeMillis());
         model.setUser(generator.getRandomThing());
         chatData.add(model);

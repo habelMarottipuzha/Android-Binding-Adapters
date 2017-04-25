@@ -107,6 +107,11 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         notifyItemInserted(position);
     }
 
+    private void calculateUnread() {
+        if (bindingInterface != null) {
+            bindingInterface.onUnreadMessageFound(getItemCount(), 0);
+        }
+    }
     private void scrollIfLast() {
         Log.w(getClass().getSimpleName(), "item size : " + items.size() + "   lvp : " + lastVisiblePosition);
         if (items.size() - 1 <= lastVisiblePosition + 1) {

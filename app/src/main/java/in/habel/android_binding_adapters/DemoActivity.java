@@ -1,6 +1,7 @@
 package in.habel.android_binding_adapters;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,34 +18,34 @@ public class DemoActivity extends AppCompatActivity {
 
     ArrayList<DemoChatModel> dataSet;
     RecyclerChatAdapter<DemoChatModel, ListChatIncomingBinding, ListChatOutgoingBinding> adapter;
-    Thread t;
-    private Runnable runnable;
 
+    EditTextWithDrawable txtSend;
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        runnable = new Runnable() {
+        txtSend = (EditTextWithDrawable) findViewById(R.id.txtSend);
+        txtSend.setDrawableClickListener(new EditTextWithDrawable.DrawableClickListener() {
             @Override
-            public void run() {
-                while (true) {
-                    runOnUiThread(new Runnable() {
+            public void onClick(DrawablePosition target) {
+                if (target == DrawablePosition.RIGHT) {
+                    String text = txtSend.getText().toString();
+                    if (text.trim().equalsIgnoreCase("")) return;
+                    DemoChatModel cur = new DemoChatModel(text, "You", System.currentTimeMillis());
+                    cur.setIsOut(true);
+                    adapter.insert(cur);
+                    txtSend.setText("");
+                    new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            updateChatData();
+                            adapter.insert(MockChatData.getChatMockData());
                         }
-                    });
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        break;
-                    }
+                    }, 1500);
                 }
             }
-        };
+        });
         dataSet = MockChatData.getChatMockDataList();
         try {
             adapter = new RecyclerChatAdapter(
@@ -62,6 +63,11 @@ public class DemoActivity extends AppCompatActivity {
 
                             }
                         }
+
+                        @Override
+                        public void onUnreadMessageFound(int totalMessages, int unreadMessages) {
+                            // TODO: 25/4/17 Need to implement
+                        }
                     });
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,29 +76,12 @@ public class DemoActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        t = new Thread(runnable);
-        t.start();
-    }
-
-    @Override
-    protected void onPause() {
-        if (t.isAlive())
-            try {
-                t.stop();
-            } catch (Exception ignored) {
-            }
-        super.onPause();
-    }
 
     private void updateChatData() {
         Log.w(getClass().getSimpleName(), "updateChatData() ");
         // dataSet = MockChatData.getChatMockDataList();
         Log.w(getClass().getSimpleName(), "updateChatData() size : " + dataSet.size());
         adapter.insert(MockChatData.getChatMockData());
-
         // adapter.refresh();
     }
 }

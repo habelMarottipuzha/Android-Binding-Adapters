@@ -7,12 +7,10 @@ import in.habel.chat_adapters.interfaces.chatInterface;
  */
 
 public class DemoChatModel implements chatInterface {
-    private static
-    boolean isOut;
+    private boolean isOut;
     private String message;
     private String user;
     private long addedOn;
-
     public DemoChatModel(String message, long addedOn) {
         this.message = message;
         this.addedOn = addedOn;
@@ -22,6 +20,10 @@ public class DemoChatModel implements chatInterface {
         this.message = message;
         this.user = user;
         this.addedOn = addedOn;
+    }
+
+    public void setIsOut(boolean isOut) {
+        this.isOut = isOut;
     }
 
     public String getMessage() {
@@ -42,7 +44,6 @@ public class DemoChatModel implements chatInterface {
 
     @Override
     public boolean isOutgoing() {
-        isOut = !isOut; //toggle chat positions
         return isOut;
     }
 

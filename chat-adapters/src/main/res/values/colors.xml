@@ -2,10 +2,10 @@
 <resources>
     <color name="divider">#EAEAE9</color>
 
-    <color name="bg_chat_bubble_out">#ef9a9a</color>
-    <color name="bg_stroke_chat_bubble_out">#dddddd</color>
+    <color name="bg_chat_bubble_out">#efebe9</color>
+    <color name="bg_stroke_chat_bubble_out">#efebe9</color>
 
 
-    <color name="bg_chat_bubble_in">#f4b7b7</color>
-    <color name="bg_stroke_chat_bubble_in">#f0f0f0</color>
+    <color name="bg_chat_bubble_in">#f5f5f5</color>
+    <color name="bg_stroke_chat_bubble_in">#f5f5f5</color>
 </resources>
