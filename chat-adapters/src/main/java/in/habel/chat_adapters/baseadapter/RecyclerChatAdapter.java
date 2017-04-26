@@ -29,7 +29,9 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
     private LinearLayoutManager linearLayoutManager;
     private ArrayList<T> items;
     private int incomingLayoutId, outgoingLayoutId;
-    private int lastVisiblePosition;
+    private int maxSeenPosition;
+    private boolean scrollToLast;
+
     @Nullable
     private RecyclerChatCallback<VM, VN, T> bindingInterface;
 
@@ -57,6 +59,7 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         recyclerView.setAdapter(this);
         FadeInUpAnimator animator = new FadeInUpAnimator(new OvershootInterpolator(.2f));
         recyclerView.setItemAnimator(animator);
+        //  maxSeenPosition = items.size();
     }
 
     @Override
@@ -74,6 +77,7 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
     public void onBindViewHolder(RecyclerChatAdapter.ViewHolder holder, int position) {
         T item = items.get(position);
         holder.bindData(item);
+        maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
     }
 
 
@@ -109,18 +113,29 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
     }
 
     public void insert(T data, int position) {
-        lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
         items.add(position, data);
         scrollIfLast();
         notifyItemInserted(position);
+        broadcastUnread();
     }
 
-    private void calculateUnread() {
-        if (bindingInterface != null) {
-            bindingInterface.onUnreadMessageFound(getItemCount(), 0);
+    private void broadcastUnread() {
+        try {
+            maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
+            if (bindingInterface != null) {
+                //   bindingInterface.onUnreadMessageFound(getItemCount(), items.size() - 2 - maxSeenPosition);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+    public void setScrollToBottom(boolean scrollToBottom) {
+        scrollToLast = scrollToBottom;
+    }
     private void scrollIfLast() {
+        if (!scrollToLast) return;
+        int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
         Log.w(getClass().getSimpleName(), "item size : " + items.size() + "   lvp : " + lastVisiblePosition);
         if (items.size() - 1 <= lastVisiblePosition + 1) {
             new Handler().post(new Runnable() {
