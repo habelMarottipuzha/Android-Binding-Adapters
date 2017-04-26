@@ -13,7 +13,7 @@ public class SimpleViewPagerAdapter extends FragmentStatePagerAdapter {
     private Fragment[] fragments;
     private String[] titles;
 
-    SimpleViewPagerAdapter(FragmentManager fm, Fragment[] fragments) throws Exception {
+    public SimpleViewPagerAdapter(FragmentManager fm, Fragment[] fragments) throws Exception {
         super(fm);
         if (fragments == null) {
             throw new Exception("Fragments cannot be null");
@@ -21,7 +21,7 @@ public class SimpleViewPagerAdapter extends FragmentStatePagerAdapter {
         this.fragments = fragments;
     }
 
-    SimpleViewPagerAdapter(FragmentManager fm, Fragment[] fragments, String titles[]) throws Exception {
+    public SimpleViewPagerAdapter(FragmentManager fm, Fragment[] fragments, String titles[]) throws Exception {
         this(fm, fragments);
         if (titles != null && titles.length != fragments.length) {
             throw new Exception("Fragment and title size doesn't match");
@@ -29,7 +29,7 @@ public class SimpleViewPagerAdapter extends FragmentStatePagerAdapter {
         this.titles = titles;
     }
 
-    SimpleViewPagerAdapter(ViewPager viewpager, FragmentManager fm, Fragment[] fragments, String titles[]) throws Exception {
+    public SimpleViewPagerAdapter(ViewPager viewpager, FragmentManager fm, Fragment[] fragments, String titles[]) throws Exception {
         this(fm, fragments, titles);
         viewpager.setAdapter(this);
     }
