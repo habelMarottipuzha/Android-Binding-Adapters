@@ -54,4 +54,28 @@ public class DemoChatModel implements chatInterface {
     public void setUser(String user) {
         this.user = user;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DemoChatModel that = (DemoChatModel) o;
+
+        if (isOut != that.isOut) return false;
+        if (addedOn != that.addedOn) return false;
+        if (!message.equals(that.message)) return false;
+        return user != null ? user.equals(that.user) : that.user == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (isOut ? 1 : 0);
+        result = 31 * result + message.hashCode();
+        result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (int) (addedOn ^ (addedOn >>> 32));
+        return result;
+    }
 }

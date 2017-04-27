@@ -160,11 +160,33 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         scrollIfLast();
     }
 
+
+    @Deprecated
     public void refresh() {
         notifyDataSetChanged();
         scrollIfLast();
     }
 
+    @SuppressWarnings("unchecked")
+    public synchronized void refresh(ArrayList<T> newData) {
+        if (newData == null) newData = new ArrayList<>();
+        int newSize = newData.size();
+        for (int i = 0; i < newSize; i++) {
+            T model = newData.get(i);
+            int itemFoundAt = items.indexOf(model);
+            if (itemFoundAt == -1) {
+                insert(model, i);
+                continue;
+            }
+            if (itemFoundAt == i) continue;
+            if (itemFoundAt > i) {
+                for (int j = i; j < itemFoundAt; j++) {
+                    remove(i);
+                }
+            }
+        }
+        for (int i = newSize, itemSize = items.size(); i < itemSize; i++) remove(newSize);
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 

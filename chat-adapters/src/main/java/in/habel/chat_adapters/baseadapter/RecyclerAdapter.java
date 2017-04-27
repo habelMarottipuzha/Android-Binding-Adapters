@@ -33,7 +33,6 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         this.layoutId = layoutId;
         this.bindingInterface = bindingInterface;
         linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
-        linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(this);
         FadeInUpAnimator animator = new FadeInUpAnimator(new OvershootInterpolator(.2f));
@@ -123,10 +122,33 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         scrollIfLast();
     }
 
+    @Deprecated
     public void refresh() {
         notifyDataSetChanged();
         scrollIfLast();
     }
+
+    @SuppressWarnings("unchecked")
+    public synchronized void refresh(ArrayList<T> newData) {
+        if (newData == null) newData = new ArrayList<>();
+        int newSize = newData.size();
+        for (int i = 0; i < newSize; i++) {
+            T model = newData.get(i);
+            int itemFoundAt = items.indexOf(model);
+            if (itemFoundAt == -1) {
+                insert(model, i);
+                continue;
+            }
+            if (itemFoundAt == i) continue;
+            if (itemFoundAt > i) {
+                for (int j = i; j < itemFoundAt; j++) {
+                    remove(i);
+                }
+            }
+        }
+        for (int i = newSize, itemSize = items.size(); i < itemSize; i++) remove(newSize);
+    }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
