@@ -167,12 +167,17 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         scrollIfLast();
     }
 
+
     @SuppressWarnings("unchecked")
     public synchronized void refresh(ArrayList<T> newData) {
         if (newData == null) newData = new ArrayList<>();
         int newSize = newData.size();
         for (int i = 0; i < newSize; i++) {
             T model = newData.get(i);
+            if (i == items.size()) {
+                insert(model, i);
+                continue;
+            }
             int itemFoundAt = items.indexOf(model);
             if (itemFoundAt == -1) {
                 insert(model, i);

@@ -134,6 +134,10 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         int newSize = newData.size();
         for (int i = 0; i < newSize; i++) {
             T model = newData.get(i);
+            if (i == items.size()) {
+                insert(model, i);
+                continue;
+            }
             int itemFoundAt = items.indexOf(model);
             if (itemFoundAt == -1) {
                 insert(model, i);
