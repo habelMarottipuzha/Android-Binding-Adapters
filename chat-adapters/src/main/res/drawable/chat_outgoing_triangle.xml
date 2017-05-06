@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <rotate
+            android:fromDegrees="45"
+            android:pivotX="13%"
+            android:pivotY="-40%"
+            android:toDegrees="45">
+            <shape android:shape="rectangle">
+                <size
+                    android:width="130dp"
+                    android:height="130dp" />
+                <solid
+                    android:width="10dp"
+                    android:color="@color/bg_chat_bubble_out" />
+            </shape>
+        </rotate>
+
+    </item>
+    <item>
+        <rotate
+            android:fromDegrees="45"
+            android:pivotX="13%"
+            android:pivotY="-40%"
+            android:toDegrees="45">
+            <shape android:shape="rectangle">
+                <size
+                    android:width="130dp"
+                    android:height="130dp" />
+                <stroke
+                    android:width="10dp"
+                    android:color="@color/bg_stroke_chat_bubble_out" />
+
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

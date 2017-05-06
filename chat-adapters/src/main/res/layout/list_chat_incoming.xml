@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="in.habel.utils.DateHelper" />
+
+        <variable
+            name="chat"
+            type="in.habel.models.DemoChatModel" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <android.support.constraint.ConstraintLayout style="@style/chatbox.incoming">
+
+            <TextView
+                android:id="@+id/txtDisplayName"
+                style="@style/chat.name"
+                android:text="@{chat.user,default=`David `}"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/txtDisplayDate"
+                style="@style/chat.time"
+                android:text="@{DateHelper.getFormattedDate(chat.addedOn),default=`21-05, 8.00 am`}"
+                app:layout_constraintBottom_toBottomOf="@+id/txtDisplayName"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintLeft_toRightOf="@+id/txtDisplayName"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView"
+                style="@style/chat.text"
+                android:text="@{chat.message,default=@string/default_chat_message}"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtDisplayName" />
+        </android.support.constraint.ConstraintLayout>
+
+        <View style="@style/chatbox_space" />
+    </LinearLayout>
+</layout>

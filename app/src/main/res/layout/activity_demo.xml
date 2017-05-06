@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccent"
-    tools:context="in.habel.android_binding_adapters.DemoActivity">
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:paddingTop="10dp"
+    tools:context="in.habel.android_binding_adapters.DemoChatActivity">
+
+    <android.support.v7.widget.SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:defaultQueryHint="Search here" />
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <in.habel.android_binding_adapters.EditTextWithDrawable
+        android:id="@+id/txtSend"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="#400f"
-        android:minHeight="200dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_marginBottom="2dp"
+        android:layout_weight="0"
+        android:background="@drawable/bg_send"
+        android:drawableRight="@android:drawable/ic_menu_send"
+        android:gravity="bottom"
+        android:hint="Type a message"
+        android:padding="10dp"
+        android:textColor="#757575" />
+</LinearLayout>

@@ -1,6 +1,5 @@
-package in.habel.chat_adapters.baseadapter;
+package in.habel.chat_adapters;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Handler;
@@ -11,33 +10,56 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 
 import java.util.ArrayList;
 
-import in.habel.chat_adapters.baseadapter.interfaces.RecyclerChatCallback;
-import in.habel.chat_adapters.baseadapter.interfaces.chatInterface;
+import in.habel.animator.FadeInUpAnimator;
+import in.habel.interfaces.RecyclerChatCallback;
+import in.habel.interfaces.chatInterface;
 
+/**
+ * @param <T>  Chat data model
+ * @param <VM> DataBinding class of incoming messages
+ * @param <VN> DataBinding class of outgoing messages
+ */
+@SuppressWarnings("unused")
 public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBinding, VN extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerChatAdapter.ViewHolder> {
     private final RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private final Context context;
     private ArrayList<T> items;
     private int incomingLayoutId, outgoingLayoutId;
-    private int lastVisiblePosition;
+    private int maxSeenPosition;
+    private boolean scrollToLast;
+
     @Nullable
     private RecyclerChatCallback<VM, VN, T> bindingInterface;
 
-    public RecyclerChatAdapter(RecyclerView recyclerView, ArrayList<T> items, int incomingLayoutId, int outgoingLayoutId, @Nullable RecyclerChatCallback<VM, VN, T> bindingInterface) {
+    /**
+     * Creates a recycler chat adapter.
+     *
+     * @param recyclerView     RecyclerView to which this adapter binds
+     * @param items            dataset of <T>
+     * @param incomingLayoutId view resource id for incoming messages
+     * @param outgoingLayoutId view resource id for outgoing messages
+     * @param bindingInterface Callback for binding adapter
+     */
+    public RecyclerChatAdapter(RecyclerView recyclerView, ArrayList<T> items, int incomingLayoutId, int outgoingLayoutId, @Nullable RecyclerChatCallback<VM, VN, T> bindingInterface) throws Exception {
         this.items = items;
-        this.context = recyclerView.getContext();
+        if (recyclerView == null)
+            throw new Exception("Recycler view for RecyclerChatAdapter cannot be null");
         this.recyclerView = recyclerView;
         this.incomingLayoutId = incomingLayoutId;
         this.outgoingLayoutId = outgoingLayoutId;
         this.bindingInterface = bindingInterface;
-        linearLayoutManager = new LinearLayoutManager(context);
+        linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
         linearLayoutManager.setSmoothScrollbarEnabled(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setAdapter(this);
+        FadeInUpAnimator animator = new FadeInUpAnimator(new OvershootInterpolator(.2f));
+        recyclerView.setItemAnimator(animator);
+        //  maxSeenPosition = items.size();
     }
 
     @Override
@@ -55,20 +77,21 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
     public void onBindViewHolder(RecyclerChatAdapter.ViewHolder holder, int position) {
         T item = items.get(position);
         holder.bindData(item);
+        maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
     }
 
 
-/*    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        T item = items.get(position);
-        holder.bindData(item);
-    }*/
-
+    /**
+     * @return size of dataset
+     */
     @Override
     public int getItemCount() {
         return items == null ? 0 : items.size();
     }
 
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
 
     @Override
     public int getItemViewType(int position) {
@@ -81,14 +104,38 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         insert(data, position);
     }
 
+    public void insert(ArrayList<T> data) {
+        if (data.size() > getItemCount()) {
+            for (int i = getItemCount(); i < data.size(); i++) {
+                insert(data.get(i));
+            }
+        }
+    }
+
     public void insert(T data, int position) {
-        lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
         items.add(position, data);
         scrollIfLast();
         notifyItemInserted(position);
+        broadcastUnread();
     }
 
+    private void broadcastUnread() {
+        try {
+            maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
+            if (bindingInterface != null) {
+                //   bindingInterface.onUnreadMessageFound(getItemCount(), items.size() - 2 - maxSeenPosition);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setScrollToBottom(boolean scrollToBottom) {
+        scrollToLast = scrollToBottom;
+    }
     private void scrollIfLast() {
+        if (!scrollToLast) return;
+        int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
         Log.w(getClass().getSimpleName(), "item size : " + items.size() + "   lvp : " + lastVisiblePosition);
         if (items.size() - 1 <= lastVisiblePosition + 1) {
             new Handler().post(new Runnable() {
@@ -113,9 +160,37 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         scrollIfLast();
     }
 
+
+    @Deprecated
     public void refresh() {
         notifyDataSetChanged();
         scrollIfLast();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public synchronized void refresh(ArrayList<T> newData) {
+        if (newData == null) newData = new ArrayList<>();
+        int newSize = newData.size();
+        for (int i = 0; i < newSize; i++) {
+            T model = newData.get(i);
+            if (i == items.size()) {
+                insert(model, i);
+                continue;
+            }
+            int itemFoundAt = items.indexOf(model);
+            if (itemFoundAt == -1) {
+                insert(model, i);
+                continue;
+            }
+            if (itemFoundAt == i) continue;
+            if (itemFoundAt > i) {
+                for (int j = i; j < itemFoundAt; j++) {
+                    remove(i);
+                }
+            }
+        }
+        for (int i = newSize, itemSize = items.size(); i < itemSize; i++) remove(newSize);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

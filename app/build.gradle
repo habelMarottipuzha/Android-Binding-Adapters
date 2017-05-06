@@ -30,7 +30,6 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:recyclerview-v7:25.3.1'
-
-    compile 'jp.wasabeef:recyclerview-animators:2.2.6'
     compile project(path: ':chat-adapters')
 }
+// compile 'com.github.habelMarottipuzha:Android-Binding-Adapters:v1.0.0.1'
