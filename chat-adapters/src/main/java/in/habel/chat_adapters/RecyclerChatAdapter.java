@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.baseadapter;
+package in.habel.chat_adapters;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
@@ -14,52 +14,90 @@ import android.view.animation.OvershootInterpolator;
 
 import java.util.ArrayList;
 
-import in.habel.chat_adapters.animator.FadeInUpAnimator;
-import in.habel.chat_adapters.interfaces.RecyclerCallback;
+import in.habel.animator.FadeInUpAnimator;
+import in.habel.interfaces.RecyclerChatCallback;
+import in.habel.interfaces.chatInterface;
 
-public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
-    private RecyclerView recyclerView;
-    private int layoutId;
-    private int maxSeenPosition;
+/**
+ * @param <T>  Chat data model
+ * @param <VM> DataBinding class of incoming messages
+ * @param <VN> DataBinding class of outgoing messages
+ */
+@SuppressWarnings("unused")
+public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBinding, VN extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerChatAdapter.ViewHolder> {
+    private final RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    @Nullable
-    private RecyclerCallback<VM, T> bindingInterface;
     private ArrayList<T> items;
+    private int incomingLayoutId, outgoingLayoutId;
+    private int maxSeenPosition;
     private boolean scrollToLast;
 
-    public RecyclerAdapter(RecyclerView view, ArrayList<T> items, int layoutId, @Nullable RecyclerCallback<VM, T> bindingInterface) {
+    @Nullable
+    private RecyclerChatCallback<VM, VN, T> bindingInterface;
+
+    /**
+     * Creates a recycler chat adapter.
+     *
+     * @param recyclerView     RecyclerView to which this adapter binds
+     * @param items            dataset of <T>
+     * @param incomingLayoutId view resource id for incoming messages
+     * @param outgoingLayoutId view resource id for outgoing messages
+     * @param bindingInterface Callback for binding adapter
+     */
+    public RecyclerChatAdapter(RecyclerView recyclerView, ArrayList<T> items, int incomingLayoutId, int outgoingLayoutId, @Nullable RecyclerChatCallback<VM, VN, T> bindingInterface) throws Exception {
         this.items = items;
-        recyclerView = view;
-        this.layoutId = layoutId;
+        if (recyclerView == null)
+            throw new Exception("Recycler view for RecyclerChatAdapter cannot be null");
+        this.recyclerView = recyclerView;
+        this.incomingLayoutId = incomingLayoutId;
+        this.outgoingLayoutId = outgoingLayoutId;
         this.bindingInterface = bindingInterface;
         linearLayoutManager = new LinearLayoutManager(recyclerView.getContext());
+        linearLayoutManager.setSmoothScrollbarEnabled(true);
         recyclerView.setLayoutManager(linearLayoutManager);
+        linearLayoutManager.setStackFromEnd(true);
         recyclerView.setAdapter(this);
         FadeInUpAnimator animator = new FadeInUpAnimator(new OvershootInterpolator(.2f));
         recyclerView.setItemAnimator(animator);
+        //  maxSeenPosition = items.size();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent,
                                          int viewType) {
+        boolean out = items.get(viewType).isOutgoing();
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(layoutId, parent, false);
-        return new ViewHolder(v);
+                .inflate(out ? outgoingLayoutId : incomingLayoutId, parent, false);
+        return new ViewHolder(v, !out);
     }
 
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onBindViewHolder(RecyclerAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerChatAdapter.ViewHolder holder, int position) {
         T item = items.get(position);
         holder.bindData(item);
         maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
     }
 
+
+    /**
+     * @return size of dataset
+     */
     @Override
     public int getItemCount() {
         return items == null ? 0 : items.size();
     }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
     // Insert a new item to the RecyclerView on a predefined position
     public void insert(T data) {
         int position = items.size();
@@ -85,13 +123,16 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         try {
             maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
             if (bindingInterface != null) {
-                bindingInterface.onUnreadMessageFound(getItemCount(), items.size() - 2 - maxSeenPosition);
+                //   bindingInterface.onUnreadMessageFound(getItemCount(), items.size() - 2 - maxSeenPosition);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public void setScrollToBottom(boolean scrollToBottom) {
+        scrollToLast = scrollToBottom;
+    }
     private void scrollIfLast() {
         if (!scrollToLast) return;
         int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
@@ -106,9 +147,6 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         }
     }
 
-    public void setScrollToBottom(boolean scrollToBottom) {
-        scrollToLast = scrollToBottom;
-    }
 
     // Remove a RecyclerView item containing a specified Data object
     public void remove(T data) {
@@ -122,11 +160,13 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         scrollIfLast();
     }
 
+
     @Deprecated
     public void refresh() {
         notifyDataSetChanged();
         scrollIfLast();
     }
+
 
     @SuppressWarnings("unchecked")
     public synchronized void refresh(ArrayList<T> newData) {
@@ -153,19 +193,24 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         for (int i = newSize, itemSize = items.size(); i < itemSize; i++) remove(newSize);
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        VM binding;
+        @Nullable
+        VM incomingBinding;
+        @Nullable
+        VN outgoingBinding;
 
-        public ViewHolder(View view) {
+        public ViewHolder(View view, boolean incoming) {
             super(view);
-            binding = DataBindingUtil.bind(view);
+            if (incoming)
+                incomingBinding = DataBindingUtil.bind(view);
+            else
+                outgoingBinding = DataBindingUtil.bind(view);
         }
 
         void bindData(T model) {
             if (bindingInterface != null)
-                bindingInterface.bindData(binding, model);
+                bindingInterface.bindData(incomingBinding, outgoingBinding, model);
         }
 
     }

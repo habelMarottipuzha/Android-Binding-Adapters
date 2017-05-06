@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.interfaces;
+package in.habel.interfaces;
 
 
 public interface RecyclerClickInterface {

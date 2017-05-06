@@ -4,11 +4,11 @@
 
     <data>
 
-        <import type="in.habel.chat_adapters.DateHelper" />
+        <import type="in.habel.utils.DateHelper" />
 
         <variable
             name="chat"
-            type="in.habel.chat_adapters.DemoChatModel" />
+            type="in.habel.models.DemoChatModel" />
     </data>
 
     <LinearLayout

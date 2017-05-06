@@ -1,6 +1,6 @@
-package in.habel.chat_adapters;
+package in.habel.models;
 
-import in.habel.chat_adapters.interfaces.chatInterface;
+import in.habel.interfaces.chatInterface;
 
 /**
  * Created by habel on 23/4/17.

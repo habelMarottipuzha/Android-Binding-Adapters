@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.baseadapter;
+package in.habel.viewpager;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

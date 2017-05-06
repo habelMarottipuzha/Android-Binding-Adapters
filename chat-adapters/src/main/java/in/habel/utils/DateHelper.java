@@ -1,4 +1,4 @@
-package in.habel.chat_adapters;
+package in.habel.utils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

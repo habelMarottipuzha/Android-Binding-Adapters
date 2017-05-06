@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.animator;
+package in.habel.animator;
 
 /**
  * Created by habel on 24/4/17.

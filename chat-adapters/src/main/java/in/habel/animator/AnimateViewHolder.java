@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.animator;
+package in.habel.animator;
 
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.support.v7.widget.RecyclerView;

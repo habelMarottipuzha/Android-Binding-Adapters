@@ -1,4 +1,4 @@
-package in.habel.chat_adapters.baseadapter;
+package in.habel.chat_adapters;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,8 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
-import in.habel.chat_adapters.R;
 
 public class RecyclerDividerItem extends RecyclerView.ItemDecoration {
     private Drawable mDivider;

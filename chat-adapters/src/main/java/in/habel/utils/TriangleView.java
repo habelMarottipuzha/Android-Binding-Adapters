@@ -1,4 +1,4 @@
-package in.habel.chat_adapters;
+package in.habel.utils;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,6 +8,8 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.View;
+
+import in.habel.chat_adapters.R;
 
 /**
  * Created by habel on 23/4/17.
