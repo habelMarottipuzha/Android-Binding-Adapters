@@ -6,15 +6,16 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import in.habel.animator.FadeInUpAnimator;
+import in.habel.enums.Scroll;
 import in.habel.interfaces.RecyclerCallback;
 
 public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
@@ -24,10 +25,10 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
     private LinearLayoutManager linearLayoutManager;
     @Nullable
     private RecyclerCallback<VM, T> bindingInterface;
-    private ArrayList<T> items;
-    private boolean scrollToLast;
+    private List<T> items;
+    private Scroll scroll = Scroll.TOP;
 
-    public RecyclerAdapter(RecyclerView view, ArrayList<T> items, int layoutId, @Nullable RecyclerCallback<VM, T> bindingInterface) {
+    public RecyclerAdapter(RecyclerView view, List<T> items, int layoutId, @Nullable RecyclerCallback<VM, T> bindingInterface) {
         this.items = items;
         recyclerView = view;
         this.layoutId = layoutId;
@@ -76,7 +77,6 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
 
     public void insert(T data, int position) {
         items.add(position, data);
-        scrollIfLast();
         notifyItemInserted(position);
         broadcastUnread();
     }
@@ -92,22 +92,31 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         }
     }
 
-    private void scrollIfLast() {
-        if (!scrollToLast) return;
-        int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
-        Log.w(getClass().getSimpleName(), "item size : " + items.size() + "   lvp : " + lastVisiblePosition);
-        if (items.size() - 1 <= lastVisiblePosition + 1) {
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    recyclerView.scrollToPosition(items.size() - 1);
-                }
-            });
-        }
+    private void scroll() {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                int scrollTo = 0;
+                if (scroll == Scroll.BOTTOM) scrollTo = items.size() - 1;
+                recyclerView.scrollToPosition(scrollTo);
+            }
+        });
     }
 
-    public void setScrollToBottom(boolean scrollToBottom) {
-        scrollToLast = scrollToBottom;
+    public void scroll(final Scroll scroll) {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                int scrollTo = 0;
+                if (scroll == Scroll.BOTTOM) scrollTo = items.size() - 1;
+                recyclerView.scrollToPosition(scrollTo);
+            }
+        });
+    }
+
+
+    public void setScroll(Scroll scroll) {
+        this.scroll = scroll;
     }
 
     // Remove a RecyclerView item containing a specified Data object
@@ -119,17 +128,19 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
     public void remove(int position) {
         items.remove(position);
         notifyItemRemoved(position);
-        scrollIfLast();
     }
 
-    @Deprecated
-    public void refresh() {
-        notifyDataSetChanged();
-        scrollIfLast();
+    public void remove(int position, boolean scroll) {
+        remove(position);
+        if (scroll) scroll();
     }
 
-    @SuppressWarnings("unchecked")
-    public synchronized void refresh(ArrayList<T> newData) {
+    public void remove(T data, boolean scroll) {
+        remove(data);
+        if (scroll) scroll();
+    }
+
+    public synchronized void refresh(List<T> newData) {
         if (newData == null) newData = new ArrayList<>();
         int newSize = newData.size();
         for (int i = 0; i < newSize; i++) {
@@ -153,12 +164,17 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         for (int i = newSize, itemSize = items.size(); i < itemSize; i++) remove(newSize);
     }
 
+    public synchronized void refresh(List<T> newData, boolean scroll) {
+        refresh(newData);
+        if (scroll) scroll();
+    }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         VM binding;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             binding = DataBindingUtil.bind(view);
         }
