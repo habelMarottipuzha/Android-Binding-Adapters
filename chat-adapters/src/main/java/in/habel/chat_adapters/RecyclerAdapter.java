@@ -61,6 +61,7 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
     public int getItemCount() {
         return items == null ? 0 : items.size();
     }
+
     // Insert a new item to the RecyclerView on a predefined position
     public void insert(T data) {
         int position = items.size();
@@ -154,7 +155,14 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
                 insert(model, i);
                 continue;
             }
-            if (itemFoundAt == i) continue;
+            if (itemFoundAt == i) {
+                if (model.equals(items.get(i)))
+                    continue;
+                else {
+                    remove(i);
+                    insert(model, i);
+                }
+            }
             if (itemFoundAt > i) {
                 for (int j = i; j < itemFoundAt; j++) {
                     remove(i);
