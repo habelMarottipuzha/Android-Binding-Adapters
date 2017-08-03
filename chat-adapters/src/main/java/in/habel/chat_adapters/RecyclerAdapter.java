@@ -170,6 +170,7 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
             }
         }
         for (int i = newSize, itemSize = items.size(); i < itemSize; i++) remove(newSize);
+        notifyDataSetChanged();
     }
 
     public synchronized void refresh(List<T> newData, boolean scroll) {
