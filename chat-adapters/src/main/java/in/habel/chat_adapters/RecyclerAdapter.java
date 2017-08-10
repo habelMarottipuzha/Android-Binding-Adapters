@@ -18,14 +18,15 @@ import in.habel.animator.FadeInUpAnimator;
 import in.habel.enums.Scroll;
 import in.habel.interfaces.RecyclerCallback;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
-    private RecyclerView recyclerView;
-    private int layoutId;
-    private int maxSeenPosition;
-    private LinearLayoutManager linearLayoutManager;
+    private final RecyclerView recyclerView;
+    private final int layoutId;
+    private final LinearLayoutManager linearLayoutManager;
     @Nullable
-    private RecyclerCallback<VM, T> bindingInterface;
-    private List<T> items;
+    private final RecyclerCallback<VM, T> bindingInterface;
+    private final List<T> items;
+    private int maxSeenPosition;
     private Scroll scroll = Scroll.TOP;
 
     public RecyclerAdapter(RecyclerView view, List<T> items, int layoutId, @Nullable RecyclerCallback<VM, T> bindingInterface) {
@@ -62,13 +63,39 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         return items == null ? 0 : items.size();
     }
 
+    private void scroll() {
+        new Handler().postDelayed(() -> {
+            int scrollTo = 0;
+            if (scroll == Scroll.BOTTOM) scrollTo = items.size() - 1;
+            recyclerView.scrollToPosition(scrollTo);
+        }, 2);
+    }
+
+    public void scroll(final Scroll scroll) {
+        new Handler().post(() -> {
+            int scrollTo = 0;
+            if (scroll == Scroll.BOTTOM) scrollTo = items.size() - 1;
+            recyclerView.scrollToPosition(scrollTo);
+        });
+    }
+
+    public void setScroll(Scroll scroll) {
+        this.scroll = scroll;
+    }
+
     // Insert a new item to the RecyclerView on a predefined position
+
+    /**
+     * Appends new data T
+     *
+     * @param data item to be inserted
+     */
     public void insert(T data) {
         int position = items.size();
         insert(data, position);
     }
 
-    public void insert(ArrayList<T> data) {
+    public void insert(List<T> data) {
         if (data.size() > getItemCount()) {
             for (int i = getItemCount(); i < data.size(); i++) {
                 insert(data.get(i));
@@ -76,49 +103,18 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         }
     }
 
+    /**
+     * Insert an item in a given position
+     *
+     * @param data     Item to be inserted
+     * @param position position of the item
+     */
     public void insert(T data, int position) {
         items.add(position, data);
         notifyItemInserted(position);
         broadcastUnread();
     }
 
-    private void broadcastUnread() {
-        try {
-            maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
-            if (bindingInterface != null) {
-                bindingInterface.onUnreadMessageFound(getItemCount(), items.size() - 2 - maxSeenPosition);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void scroll() {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                int scrollTo = 0;
-                if (scroll == Scroll.BOTTOM) scrollTo = items.size() - 1;
-                recyclerView.scrollToPosition(scrollTo);
-            }
-        });
-    }
-
-    public void scroll(final Scroll scroll) {
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                int scrollTo = 0;
-                if (scroll == Scroll.BOTTOM) scrollTo = items.size() - 1;
-                recyclerView.scrollToPosition(scrollTo);
-            }
-        });
-    }
-
-
-    public void setScroll(Scroll scroll) {
-        this.scroll = scroll;
-    }
 
     // Remove a RecyclerView item containing a specified Data object
     public void remove(T data) {
@@ -173,15 +169,27 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         notifyDataSetChanged();
     }
 
-    public synchronized void refresh(List<T> newData, boolean scroll) {
+    public synchronized void refresh(List<T> newData, Scroll scroll) {
         refresh(newData);
-        if (scroll) scroll();
+        setScroll(scroll);
+        scroll();
+    }
+
+    private void broadcastUnread() {
+        try {
+            maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
+            if (bindingInterface != null) {
+                bindingInterface.onUnreadMessageFound(getItemCount(), items.size() - 2 - maxSeenPosition);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        VM binding;
+        final VM binding;
 
         ViewHolder(View view) {
             super(view);

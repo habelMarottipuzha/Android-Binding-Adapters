@@ -29,8 +29,8 @@ public class DemoChatActivity extends AppCompatActivity implements EditTextWithD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        txtSend = (EditTextWithDrawable) findViewById(R.id.txtSend);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        txtSend = findViewById(R.id.txtSend);
         txtSend.setDrawableClickListener(this);
         dataSet = MockChatData.getChatMockDataList();
         try {
@@ -78,23 +78,15 @@ public class DemoChatActivity extends AppCompatActivity implements EditTextWithD
     @Override
     protected void onResume() {
         super.onResume();
-        t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 25; i++) {
-                    Log.e(DemoChatActivity.this.getClass().getSimpleName(), "onThread : " + t.getId());
+        t = new Thread(() -> {
+            for (int i = 0; i < 25; i++) {
+                Log.e(DemoChatActivity.this.getClass().getSimpleName(), "onThread : " + t.getId());
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateChatData();
-                        }
-                    });
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                runOnUiThread(this::updateChatData);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -124,12 +116,7 @@ public class DemoChatActivity extends AppCompatActivity implements EditTextWithD
             cur.setIsOut(true);
             adapter.insert(cur);
             txtSend.setText("");
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.insert(MockChatData.getChatMockData());
-                }
-            }, 1500);
+            new Handler().postDelayed(() -> adapter.insert(MockChatData.getChatMockData()), 1500);
         }
     }
 }

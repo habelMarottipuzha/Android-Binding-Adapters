@@ -138,12 +138,7 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
         Log.w(getClass().getSimpleName(), "item size : " + items.size() + "   lvp : " + lastVisiblePosition);
         if (items.size() - 1 <= lastVisiblePosition + 1) {
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    recyclerView.scrollToPosition(items.size() - 1);
-                }
-            });
+            new Handler().post(() -> recyclerView.scrollToPosition(items.size() - 1));
         }
     }
 

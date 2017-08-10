@@ -31,8 +31,8 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        txtSend = (EditTextWithDrawable) findViewById(R.id.txtSend);
+        recyclerView = findViewById(R.id.recyclerView);
+        txtSend = findViewById(R.id.txtSend);
         txtSend.setDrawableClickListener(this);
         dataSet = MockChatData.getChatMockDataList();
         MockChatData.clear();
@@ -40,7 +40,7 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
             dataSet.add(new DemoChatModel("mx" + i, 0));
         }
         updateAdapter();
-        setSearch((SearchView) findViewById(R.id.searchView));
+        setSearch(findViewById(R.id.searchView));
     }
 
     @SuppressWarnings("unchecked")
@@ -87,23 +87,15 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
     @Override
     protected void onResume() {
         super.onResume();
-        t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < 10; i++) {
-                    Log.e(DemoListActivity.this.getClass().getSimpleName(), "onThread : " + t.getId());
+        t = new Thread(() -> {
+            for (int i = 0; i < 10; i++) {
+                Log.e(DemoListActivity.this.getClass().getSimpleName(), "onThread : " + t.getId());
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateChatData();
-                        }
-                    });
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                runOnUiThread(this::updateChatData);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -145,12 +137,7 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
             cur.setIsOut(true);
             adapter.insert(cur);
             txtSend.setText("");
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    adapter.insert(MockChatData.getChatMockData());
-                }
-            }, 1500);
+            new Handler().postDelayed(() -> adapter.insert(MockChatData.getChatMockData()), 1500);
         }
     }
 }

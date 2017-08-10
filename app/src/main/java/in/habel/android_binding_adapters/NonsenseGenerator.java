@@ -29,7 +29,7 @@ public class NonsenseGenerator {
             "expected to buy", "expected to sell", "reported to have met with", "works together with",
             "plans cease fire against", "starts war with", "signs truce with", "now manages"};
     private static NonsenseGenerator sInstance;
-    private Random mRandom;
+    private final Random mRandom;
 
     private NonsenseGenerator() {
         mRandom = new Random();
@@ -96,7 +96,7 @@ public class NonsenseGenerator {
     public String makeText(int numSentences) {
         StringBuilder sb = new StringBuilder();
         while (numSentences-- > 0) {
-            sb.append(makeSentence(false) + ".");
+            sb.append(makeSentence(false)).append(".");
             if (numSentences > 0) {
                 sb.append(" ");
             }

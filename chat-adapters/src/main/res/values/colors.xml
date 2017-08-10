@@ -3,9 +3,7 @@
     <color name="divider">#EAEAE9</color>
 
     <color name="bg_chat_bubble_out">#efebe9</color>
-    <color name="bg_stroke_chat_bubble_out">#efebe9</color>
 
 
     <color name="bg_chat_bubble_in">#f5f5f5</color>
-    <color name="bg_stroke_chat_bubble_in">#f5f5f5</color>
 </resources>

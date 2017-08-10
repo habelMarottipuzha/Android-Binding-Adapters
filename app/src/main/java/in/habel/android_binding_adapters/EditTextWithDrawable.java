@@ -1,7 +1,6 @@
 package in.habel.android_binding_adapters;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -34,15 +33,7 @@ public class EditTextWithDrawable extends android.support.v7.widget.AppCompatEdi
         super(context, attrs, defStyle);
     }
 
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
 
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-    }
 
     @Override
     public void setCompoundDrawables(Drawable left, Drawable top,
@@ -82,7 +73,6 @@ public class EditTextWithDrawable extends android.support.v7.widget.AppCompatEdi
 
             // this works for left since container shares 0,0 origin with bounds
             if (drawableLeft != null) {
-                bounds = null;
                 bounds = drawableLeft.getBounds();
 
                 int x, y;
@@ -118,7 +108,6 @@ public class EditTextWithDrawable extends android.support.v7.widget.AppCompatEdi
 
             if (drawableRight != null) {
 
-                bounds = null;
                 bounds = drawableRight.getBounds();
 
                 int x, y;

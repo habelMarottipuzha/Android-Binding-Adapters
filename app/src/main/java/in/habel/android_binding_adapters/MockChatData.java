@@ -11,9 +11,8 @@ import in.habel.models.DemoChatModel;
  */
 
 class MockChatData {
+    private static final NonsenseGenerator generator = NonsenseGenerator.getInstance();
     private static ArrayList<DemoChatModel> chatData;
-    private static NonsenseGenerator generator = NonsenseGenerator.getInstance();
-
 
     static ArrayList<DemoChatModel> getChatMockDataList() {
         if (chatData == null) {

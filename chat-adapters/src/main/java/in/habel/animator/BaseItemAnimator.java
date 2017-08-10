@@ -21,18 +21,18 @@ import java.util.List;
 public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
     private static final boolean DEBUG = false;
-    protected ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
-    protected ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
+    protected final ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
+    protected final ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
+    private final ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
+    private final ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();
+    private final ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
+    private final ArrayList<ChangeInfo> mPendingChanges = new ArrayList<>();
+    private final ArrayList<ArrayList<ViewHolder>> mAdditionsList = new ArrayList<>();
+    private final ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
+    private final ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
+    private final ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
+    private final ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
     protected Interpolator mInterpolator = new DecelerateInterpolator();
-    private ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
-    private ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();
-    private ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
-    private ArrayList<ChangeInfo> mPendingChanges = new ArrayList<>();
-    private ArrayList<ArrayList<ViewHolder>> mAdditionsList = new ArrayList<>();
-    private ArrayList<ArrayList<MoveInfo>> mMovesList = new ArrayList<>();
-    private ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
-    private ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
-    private ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
 
     public BaseItemAnimator() {
         super();
@@ -60,24 +60,21 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         mPendingRemovals.clear();
         // Next, move stuff
         if (movesPending) {
-            final ArrayList<MoveInfo> moves = new ArrayList<MoveInfo>();
+            final ArrayList<MoveInfo> moves = new ArrayList<>();
             moves.addAll(mPendingMoves);
             mMovesList.add(moves);
             mPendingMoves.clear();
-            Runnable mover = new Runnable() {
-                @Override
-                public void run() {
-                    boolean removed = mMovesList.remove(moves);
-                    if (!removed) {
-                        // already canceled
-                        return;
-                    }
-                    for (MoveInfo moveInfo : moves) {
-                        animateMoveImpl(moveInfo.holder, moveInfo.fromX, moveInfo.fromY, moveInfo.toX,
-                                moveInfo.toY);
-                    }
-                    moves.clear();
+            Runnable mover = () -> {
+                boolean removed = mMovesList.remove(moves);
+                if (!removed) {
+                    // already canceled
+                    return;
                 }
+                for (MoveInfo moveInfo : moves) {
+                    animateMoveImpl(moveInfo.holder, moveInfo.fromX, moveInfo.fromY, moveInfo.toX,
+                            moveInfo.toY);
+                }
+                moves.clear();
             };
             if (removalsPending) {
                 View view = moves.get(0).holder.itemView;
@@ -88,23 +85,20 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         }
         // Next, change stuff, to run in parallel with move animations
         if (changesPending) {
-            final ArrayList<ChangeInfo> changes = new ArrayList<ChangeInfo>();
+            final ArrayList<ChangeInfo> changes = new ArrayList<>();
             changes.addAll(mPendingChanges);
             mChangesList.add(changes);
             mPendingChanges.clear();
-            Runnable changer = new Runnable() {
-                @Override
-                public void run() {
-                    boolean removed = mChangesList.remove(changes);
-                    if (!removed) {
-                        // already canceled
-                        return;
-                    }
-                    for (ChangeInfo change : changes) {
-                        animateChangeImpl(change);
-                    }
-                    changes.clear();
+            Runnable changer = () -> {
+                boolean removed = mChangesList.remove(changes);
+                if (!removed) {
+                    // already canceled
+                    return;
                 }
+                for (ChangeInfo change : changes) {
+                    animateChangeImpl(change);
+                }
+                changes.clear();
             };
             if (removalsPending) {
                 ViewHolder holder = changes.get(0).oldHolder;
@@ -115,22 +109,20 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         }
         // Next, add stuff
         if (additionsPending) {
-            final ArrayList<ViewHolder> additions = new ArrayList<ViewHolder>();
+            final ArrayList<ViewHolder> additions = new ArrayList<>();
             additions.addAll(mPendingAdditions);
             mAdditionsList.add(additions);
             mPendingAdditions.clear();
-            Runnable adder = new Runnable() {
-                public void run() {
-                    boolean removed = mAdditionsList.remove(additions);
-                    if (!removed) {
-                        // already canceled
-                        return;
-                    }
-                    for (ViewHolder holder : additions) {
-                        doAnimateAdd(holder);
-                    }
-                    additions.clear();
+            Runnable adder = () -> {
+                boolean removed = mAdditionsList.remove(additions);
+                if (!removed) {
+                    // already canceled
+                    return;
                 }
+                for (ViewHolder holder : additions) {
+                    doAnimateAdd(holder);
+                }
+                additions.clear();
             };
             if (removalsPending || movesPending || changesPending) {
                 long removeDuration = removalsPending ? getRemoveDuration() : 0;
@@ -222,8 +214,8 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateMove(final ViewHolder holder, int fromX, int fromY, int toX, int toY) {
         final View view = holder.itemView;
-        fromX += ViewCompat.getTranslationX(holder.itemView);
-        fromY += ViewCompat.getTranslationY(holder.itemView);
+        fromX += holder.itemView.getTranslationX();
+        fromY += holder.itemView.getTranslationY();
         endAnimation(holder);
         int deltaX = toX - fromX;
         int deltaY = toY - fromY;
@@ -285,9 +277,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     @Override
     public boolean animateChange(ViewHolder oldHolder, ViewHolder newHolder, int fromX, int fromY,
                                  int toX, int toY) {
-        final float prevTranslationX = ViewCompat.getTranslationX(oldHolder.itemView);
-        final float prevTranslationY = ViewCompat.getTranslationY(oldHolder.itemView);
-        final float prevAlpha = ViewCompat.getAlpha(oldHolder.itemView);
+        final float prevTranslationX = oldHolder.itemView.getTranslationX();
+        final float prevTranslationY = oldHolder.itemView.getTranslationY();
+        final float prevAlpha = oldHolder.itemView.getAlpha();
         endAnimation(oldHolder);
         int deltaX = (int) (toX - fromX - prevTranslationX);
         int deltaY = (int) (toY - fromY - prevTranslationY);
@@ -600,8 +592,11 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
     private static class MoveInfo {
 
-        public ViewHolder holder;
-        public int fromX, fromY, toX, toY;
+        public final ViewHolder holder;
+        public final int fromX;
+        public final int fromY;
+        public final int toX;
+        public final int toY;
 
         private MoveInfo(ViewHolder holder, int fromX, int fromY, int toX, int toY) {
             this.holder = holder;
@@ -661,7 +656,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
     protected class DefaultAddVpaListener extends VpaListenerAdapter {
 
-        RecyclerView.ViewHolder mViewHolder;
+        final RecyclerView.ViewHolder mViewHolder;
 
         public DefaultAddVpaListener(final RecyclerView.ViewHolder holder) {
             mViewHolder = holder;
@@ -688,7 +683,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
     protected class DefaultRemoveVpaListener extends VpaListenerAdapter {
 
-        RecyclerView.ViewHolder mViewHolder;
+        final RecyclerView.ViewHolder mViewHolder;
 
         public DefaultRemoveVpaListener(final RecyclerView.ViewHolder holder) {
             mViewHolder = holder;
