@@ -3,6 +3,7 @@ package in.habel.chat_adapters;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Handler;
+import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +24,8 @@ import in.habel.interfaces.chatInterface;
  * @param <VM> DataBinding class of incoming messages
  * @param <VN> DataBinding class of outgoing messages
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("WeakerAccess")
+@Keep
 public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBinding, VN extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerChatAdapter.ViewHolder> {
     private final RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
@@ -163,7 +165,6 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
     }
 
 
-    @SuppressWarnings("unchecked")
     public synchronized void refresh(ArrayList<T> newData) {
         if (newData == null) newData = new ArrayList<>();
         int newSize = newData.size();

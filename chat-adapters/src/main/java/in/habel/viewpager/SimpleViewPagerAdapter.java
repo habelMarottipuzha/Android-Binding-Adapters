@@ -9,6 +9,7 @@ import android.support.v4.view.ViewPager;
  * Created by instio on 26/4/17.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class SimpleViewPagerAdapter extends FragmentStatePagerAdapter {
     private Fragment[] fragments;
     private String[] titles;

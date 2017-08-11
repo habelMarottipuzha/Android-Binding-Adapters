@@ -1,4 +1,4 @@
-# Android Recycler Adapter with Databinding with Chat support  [![Build Status](https://travis-ci.org/gotev/recycler-adapter.svg?branch=master)](https://travis-ci.org/gotev/recycler-adapter) [![Javadocs](http://javadoc.io/badge/net.gotev/recycleradapter.svg)](http://javadoc.io/doc/net.gotev/recycleradapter) <a href="http://www.methodscount.com/?lib=net.gotev%3Arecycleradapter%3A1.5.3"></a>
+# Android Recycler Adapter with Databinding(Chat and List support)[![Build Status](https://travis-ci.org/gotev/recycler-adapter.svg?branch=master)](https://travis-ci.org/gotev/recycler-adapter) [![Javadocs](http://javadoc.io/badge/net.gotev/recycleradapter.svg)](http://javadoc.io/doc/net.gotev/recycleradapter) <a href="http://www.methodscount.com/?lib=net.gotev%3Arecycleradapter%3A1.5.3"></a>
 
  This library helps to simplify the burden of writing adapter class for every RecyclerView.
  It also reduces chance for getting errors.  

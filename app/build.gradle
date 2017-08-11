@@ -13,10 +13,13 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+            lintOptions {
+                disable 'MissingTranslation'
+            }
         }
     }
 
@@ -36,5 +39,6 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    implementation 'com.android.support:cardview-v7:26.0.1'
 }
 // compile 'com.github.habelMarottipuzha:Android-Binding-Adapters:v1.0.0.1'

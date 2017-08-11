@@ -9,6 +9,7 @@ import java.util.Locale;
  * Created by habel on 24/4/17.
  */
 
+@SuppressWarnings("WeakerAccess")
 public class DateHelper {
 
     public static String getFormattedDate(long millis) {

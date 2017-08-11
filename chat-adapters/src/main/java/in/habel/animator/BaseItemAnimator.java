@@ -5,6 +5,7 @@ package in.habel.animator;
  */
 
 
+import android.support.annotation.Keep;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListener;
@@ -18,11 +19,12 @@ import android.view.animation.Interpolator;
 import java.util.ArrayList;
 import java.util.List;
 
+@Keep
 public abstract class BaseItemAnimator extends SimpleItemAnimator {
 
     private static final boolean DEBUG = false;
-    protected final ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
-    protected final ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
+    private final ArrayList<ViewHolder> mAddAnimations = new ArrayList<>();
+    private final ArrayList<ViewHolder> mRemoveAnimations = new ArrayList<>();
     private final ArrayList<ViewHolder> mPendingRemovals = new ArrayList<>();
     private final ArrayList<ViewHolder> mPendingAdditions = new ArrayList<>();
     private final ArrayList<MoveInfo> mPendingMoves = new ArrayList<>();
@@ -32,9 +34,9 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
     private final ArrayList<ArrayList<ChangeInfo>> mChangesList = new ArrayList<>();
     private final ArrayList<ViewHolder> mMoveAnimations = new ArrayList<>();
     private final ArrayList<ViewHolder> mChangeAnimations = new ArrayList<>();
-    protected Interpolator mInterpolator = new DecelerateInterpolator();
+    Interpolator mInterpolator = new DecelerateInterpolator();
 
-    public BaseItemAnimator() {
+    BaseItemAnimator() {
         super();
         setSupportsChangeAnimations(false);
     }
@@ -137,7 +139,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         }
     }
 
-    protected void preAnimateRemoveImpl(final RecyclerView.ViewHolder holder) {
+    private void preAnimateRemoveImpl(final RecyclerView.ViewHolder holder) {
     }
 
     protected void preAnimateAddImpl(final RecyclerView.ViewHolder holder) {
@@ -195,7 +197,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         return true;
     }
 
-    protected long getRemoveDelay(final RecyclerView.ViewHolder holder) {
+    long getRemoveDelay(final RecyclerView.ViewHolder holder) {
         return Math.abs(holder.getOldPosition() * getRemoveDuration() / 4);
     }
 
@@ -207,7 +209,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         return true;
     }
 
-    protected long getAddDelay(final RecyclerView.ViewHolder holder) {
+    long getAddDelay(final RecyclerView.ViewHolder holder) {
         return Math.abs(holder.getAdapterPosition() * getAddDuration() / 4);
     }
 
@@ -584,7 +586,7 @@ public abstract class BaseItemAnimator extends SimpleItemAnimator {
         dispatchAnimationsFinished();
     }
 
-    void cancelAll(List<ViewHolder> viewHolders) {
+    private void cancelAll(List<ViewHolder> viewHolders) {
         for (int i = viewHolders.size() - 1; i >= 0; i--) {
             ViewCompat.animate(viewHolders.get(i).itemView).cancel();
         }

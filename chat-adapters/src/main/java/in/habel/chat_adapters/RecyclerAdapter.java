@@ -3,6 +3,7 @@ package in.habel.chat_adapters;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
 import android.os.Handler;
+import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import in.habel.enums.Scroll;
 import in.habel.interfaces.RecyclerCallback;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+@Keep
 public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
     private final RecyclerView recyclerView;
     private final int layoutId;

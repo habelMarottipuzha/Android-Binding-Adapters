@@ -1,12 +1,14 @@
 package in.habel.models;
 
+import java.io.Serializable;
+
 import in.habel.interfaces.chatInterface;
 
 /**
  * Created by habel on 23/4/17.
  */
 
-public class DemoChatModel implements chatInterface {
+public class DemoChatModel implements chatInterface, Serializable {
     private boolean isOut;
     private String message;
     private String user;
