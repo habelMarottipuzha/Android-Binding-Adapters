@@ -11,6 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import in.habel.chat_adapters.RecyclerAdapter;
 import in.habel.chat_adapters.databinding.ListChatIncomingBinding;
@@ -19,18 +22,19 @@ import in.habel.models.DemoChatModel;
 
 public class DemoListActivity extends AppCompatActivity implements EditTextWithDrawable.DrawableClickListener {
 
-    static Thread t;
     ArrayList<DemoChatModel> dataSet;
     RecyclerAdapter<DemoChatModel, ListChatIncomingBinding> adapter;
     EditTextWithDrawable txtSend;
     RecyclerView recyclerView;
     String searchQuery = "";
-
+    ExecutorService taskExecutor;
+    Random random;
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
+        random = new Random(123987);
         recyclerView = findViewById(R.id.recyclerView);
         txtSend = findViewById(R.id.txtSend);
         txtSend.setDrawableClickListener(this);
@@ -84,35 +88,32 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        t = new Thread(() -> {
-            for (int i = 0; i < 10; i++) {
-                Log.e(DemoListActivity.this.getClass().getSimpleName(), "onThread : " + t.getId());
-
-                runOnUiThread(this::updateChatData);
+    private void insertRandomMessages(int count) {
+        for (int i = 0; i < count; i++) {
+            if (taskExecutor == null || taskExecutor.isShutdown() || taskExecutor.isTerminated())
+                taskExecutor = Executors.newFixedThreadPool(4);
+            taskExecutor.execute(() -> {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(random.nextInt(10000));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-        });
-        //  t.start();
+                runOnUiThread(() -> adapter.insert(MockChatData.getChatMockData()));
+            });
+
+        }
+        taskExecutor.shutdown();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        insertRandomMessages(12);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            t.interrupt();
-        } catch (Exception ignored) {
-        }
-    }
-
-    private void updateChatData() {
-        adapter.insert(MockChatData.getChatMockData());
     }
 
     @Override
