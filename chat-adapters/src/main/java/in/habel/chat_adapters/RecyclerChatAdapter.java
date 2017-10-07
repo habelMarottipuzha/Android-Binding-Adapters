@@ -47,8 +47,9 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
      * @param outgoingLayoutId view resource id for outgoing messages
      * @param bindingInterface Callback for binding adapter
      */
-    public RecyclerChatAdapter(RecyclerView recyclerView, ArrayList<T> items, int incomingLayoutId, int outgoingLayoutId, @Nullable RecyclerChatCallback<VM, VN, T> bindingInterface) throws Exception {
-        this.items = items;
+    public RecyclerChatAdapter(RecyclerView recyclerView, List<T> items, int incomingLayoutId, int outgoingLayoutId, @Nullable RecyclerChatCallback<VM, VN, T> bindingInterface) throws Exception {
+        if (this.items == null) this.items = new ArrayList<>();
+        this.items.addAll(items);
         if (recyclerView == null)
             throw new Exception("Recycler view for RecyclerChatAdapter cannot be null");
         this.recyclerView = recyclerView;
