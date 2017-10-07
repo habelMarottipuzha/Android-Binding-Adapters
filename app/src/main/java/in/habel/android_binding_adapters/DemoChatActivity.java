@@ -112,7 +112,7 @@ public class DemoChatActivity extends AppCompatActivity implements EditTextWithD
         if (target == DrawablePosition.RIGHT) {
             String text = txtSend.getText().toString();
             if (text.trim().equalsIgnoreCase("")) return;
-            DemoChatModel cur = new DemoChatModel(text, "You", System.currentTimeMillis());
+            DemoChatModel cur = new DemoChatModel(text, "You", System.currentTimeMillis(), NonsenseGenerator.getInstance().getRandomBool());
             cur.setIsOut(true);
             adapter.insert(cur);
             txtSend.setText("");

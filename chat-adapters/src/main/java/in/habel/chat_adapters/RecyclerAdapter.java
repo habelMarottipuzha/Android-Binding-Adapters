@@ -114,7 +114,6 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
     public void insert(T data, int position) {
         items.add(position, data);
         notifyItemInserted(position);
-        broadcastUnread();
     }
 
 
@@ -176,18 +175,6 @@ public class RecyclerAdapter<T, VM extends ViewDataBinding> extends RecyclerView
         setScroll(scroll);
         scroll();
     }
-
-    private void broadcastUnread() {
-        try {
-            maxSeenPosition = Math.max(maxSeenPosition, linearLayoutManager.findLastVisibleItemPosition());
-            if (bindingInterface != null) {
-                bindingInterface.onUnreadMessageFound(getItemCount(), items.size() - 2 - maxSeenPosition);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     class ViewHolder extends RecyclerView.ViewHolder {
 

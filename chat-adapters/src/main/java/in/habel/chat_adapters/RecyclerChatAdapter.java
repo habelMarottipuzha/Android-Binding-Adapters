@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import in.habel.animator.FadeInUpAnimator;
 import in.habel.interfaces.RecyclerChatCallback;
@@ -24,16 +25,16 @@ import in.habel.interfaces.chatInterface;
  * @param <VM> DataBinding class of incoming messages
  * @param <VN> DataBinding class of outgoing messages
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 @Keep
 public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBinding, VN extends ViewDataBinding> extends RecyclerView.Adapter<RecyclerChatAdapter.ViewHolder> {
     private final RecyclerView recyclerView;
+    Handler handler;
     private LinearLayoutManager linearLayoutManager;
     private ArrayList<T> items;
     private int incomingLayoutId, outgoingLayoutId;
     private int maxSeenPosition;
     private boolean scrollToLast;
-
     @Nullable
     private RecyclerChatCallback<VM, VN, T> bindingInterface;
 
@@ -70,6 +71,7 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         boolean out = items.get(viewType).isOutgoing();
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(out ? outgoingLayoutId : incomingLayoutId, parent, false);
+        handler = new Handler();
         return new ViewHolder(v, !out);
     }
 
@@ -106,7 +108,7 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         insert(data, position);
     }
 
-    public void insert(ArrayList<T> data) {
+    public void insert(List<T> data) {
         if (data.size() > getItemCount()) {
             for (int i = getItemCount(); i < data.size(); i++) {
                 insert(data.get(i));
@@ -135,12 +137,13 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
     public void setScrollToBottom(boolean scrollToBottom) {
         scrollToLast = scrollToBottom;
     }
+
     private void scrollIfLast() {
         if (!scrollToLast) return;
         int lastVisiblePosition = linearLayoutManager.findLastVisibleItemPosition();
         Log.w(getClass().getSimpleName(), "item size : " + items.size() + "   lvp : " + lastVisiblePosition);
         if (items.size() - 1 <= lastVisiblePosition + 1) {
-            new Handler().post(() -> recyclerView.scrollToPosition(items.size() - 1));
+            handler.post(() -> recyclerView.scrollToPosition(items.size() - 1));
         }
     }
 
@@ -164,8 +167,7 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
         scrollIfLast();
     }
 
-
-    public synchronized void refresh(ArrayList<T> newData) {
+    public synchronized void refresh(List<T> newData) {
         if (newData == null) newData = new ArrayList<>();
         int newSize = newData.size();
         for (int i = 0; i < newSize; i++) {
@@ -179,7 +181,14 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
                 insert(model, i);
                 continue;
             }
-            if (itemFoundAt == i) continue;
+            if (itemFoundAt == i) {
+                if (model.equals(items.get(i)))
+                    continue;
+                else {
+                    remove(i);
+                    insert(model, i);
+                }
+            }
             if (itemFoundAt > i) {
                 for (int j = i; j < itemFoundAt; j++) {
                     remove(i);
@@ -187,7 +196,9 @@ public class RecyclerChatAdapter<T extends chatInterface, VM extends ViewDataBin
             }
         }
         for (int i = newSize, itemSize = items.size(); i < itemSize; i++) remove(newSize);
+        notifyDataSetChanged();
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 

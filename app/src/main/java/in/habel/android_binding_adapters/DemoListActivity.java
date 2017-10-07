@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -29,6 +28,7 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
     String searchQuery = "";
     ExecutorService taskExecutor;
     Random random;
+
     @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +58,6 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
                         @Override
                         public void bindData(ListChatIncomingBinding binder, DemoChatModel model) {
                             binder.setChat(model);
-                        }
-
-
-                        @Override
-                        public void onUnreadMessageFound(int totalMessages, int unreadMessages) {
-                            Log.e(DemoListActivity.this.getClass().getSimpleName(), "onUnreadMessageFound : " + unreadMessages);
                         }
                     });
         } catch (Exception e) {
@@ -134,7 +128,7 @@ public class DemoListActivity extends AppCompatActivity implements EditTextWithD
         if (target == DrawablePosition.RIGHT) {
             String text = txtSend.getText().toString();
             if (text.trim().equalsIgnoreCase("")) return;
-            DemoChatModel cur = new DemoChatModel(text, "You", System.currentTimeMillis());
+            DemoChatModel cur = new DemoChatModel(text, "You", System.currentTimeMillis(), NonsenseGenerator.getInstance().getRandomBool());
             cur.setIsOut(true);
             adapter.insert(cur);
             txtSend.setText("");

@@ -28,6 +28,7 @@ public class NonsenseGenerator {
             "is authorized to sell", "sells", "buys", "rents", "allegedly speaks to", "leases", "invests on",
             "expected to buy", "expected to sell", "reported to have met with", "works together with",
             "plans cease fire against", "starts war with", "signs truce with", "now manages"};
+    private static final Boolean[] BOOL_VALUE = {true, false, true, false};
     private static NonsenseGenerator sInstance;
     private final Random mRandom;
 
@@ -85,6 +86,10 @@ public class NonsenseGenerator {
 
     public String getRandomThing() {
         return pickOneOf(THINGS);
+    }
+
+    public boolean getRandomBool() {
+        return mRandom.nextBoolean();
     }
 
     /**

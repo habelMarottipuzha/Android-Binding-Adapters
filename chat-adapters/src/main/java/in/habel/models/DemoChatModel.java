@@ -13,15 +13,17 @@ public class DemoChatModel implements chatInterface, Serializable {
     private String message;
     private String user;
     private long addedOn;
+
     public DemoChatModel(String message, long addedOn) {
         this.message = message;
         this.addedOn = addedOn;
     }
 
-    public DemoChatModel(String message, String user, long addedOn) {
+    public DemoChatModel(String message, String user, long addedOn, boolean isOut) {
         this.message = message;
         this.user = user;
         this.addedOn = addedOn;
+        this.isOut = isOut;
     }
 
     public void setIsOut(boolean isOut) {

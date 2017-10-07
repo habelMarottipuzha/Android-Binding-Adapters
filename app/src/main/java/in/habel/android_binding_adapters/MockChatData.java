@@ -24,7 +24,7 @@ class MockChatData {
     }
 
     static DemoChatModel getChatMockData() {
-        return new DemoChatModel(generator.makeText(2), generator.getRandomThing(), System.currentTimeMillis());
+        return new DemoChatModel(generator.makeText(2), generator.getRandomThing(), System.currentTimeMillis(), generator.getRandomBool());
     }
 
     static ArrayList<DemoChatModel> filter(String search) {
